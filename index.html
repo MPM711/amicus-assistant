@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Amicus">
+<title>Amicus — Your Trusted Friend</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #13131a;
+  --bg3: #1c1c26;
+  --bg4: #252532;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #eeeef5;
+  --text2: rgba(238,238,245,0.5);
+  --text3: rgba(238,238,245,0.28);
+  --gold: #c9a84c;
+  --gold-dim: rgba(201,168,76,0.12);
+  --gold-glow: rgba(201,168,76,0.06);
+  --green: #4ade80;
+  --green-dim: rgba(74,222,128,0.12);
+  --blue: #7eb3ff;
+  --blue-dim: rgba(126,179,255,0.12);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.12);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.12);
+  --purple: #c084fc;
+  --purple-dim: rgba(192,132,252,0.12);
+  --teal: #2dd4bf;
+  --teal-dim: rgba(45,212,191,0.12);
+  --radius: 18px;
+  --radius-sm: 11px;
+  --font: 'Sora', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --nav-h: 68px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%; overflow: hidden;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 10;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.header-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 300;
+  letter-spacing: 0.3px;
+  margin-top: 1px;
+}
+.header-time {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text3);
+  text-align: right;
+}
+
+/* ── PAGES ── */
+.pages {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--nav-h) + 16px);
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.page.active { display: flex; }
+
+/* ── NAV ── */
+.nav {
+  flex-shrink: 0;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 0 6px;
+  position: relative;
+  z-index: 10;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s, background 0.2s;
+}
+.nav-btn .icon { font-size: 22px; line-height: 1; }
+.nav-btn.active {
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.card-header {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.card-body { padding: 14px 16px; }
+
+/* ── MIC BUTTON ── */
+.mic-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 16px;
+}
+.mic-btn {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(145deg, var(--bg3), var(--bg4));
+  box-shadow: 0 0 0 1px var(--border2), 0 8px 32px rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.mic-btn.listening {
+  background: linear-gradient(145deg, #1a1a08, #2a2a10);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 40px rgba(201,168,76,0.3), 0 8px 32px rgba(0,0,0,0.5);
+  animation: pulse-ring 1.5s ease-in-out infinite;
+}
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 1px var(--gold), 0 0 40px rgba(201,168,76,0.3), 0 8px 32px rgba(0,0,0,0.5); }
+  50% { box-shadow: 0 0 0 3px var(--gold), 0 0 60px rgba(201,168,76,0.5), 0 8px 32px rgba(0,0,0,0.5); }
+}
+.mic-hint {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.5;
+}
+.mic-transcript {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text);
+  min-height: 52px;
+  line-height: 1.5;
+  display: none;
+  font-style: italic;
+}
+.mic-transcript.visible { display: block; }
+
+/* ── QUICK ACTIONS ── */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.quick-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+.quick-btn:active { background: var(--bg3); }
+.quick-btn .qb-icon { font-size: 22px; }
+.quick-btn .qb-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.quick-btn .qb-hint {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── REMINDER ITEM ── */
+.reminder-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.reminder-item.critical { border-left: 3px solid var(--red); }
+.reminder-item.urgent { border-left: 3px solid var(--orange); }
+.reminder-item.important { border-left: 3px solid var(--gold); }
+.reminder-item.followup { border-left: 3px solid var(--purple); }
+.reminder-item.routine { border-left: 3px solid var(--blue); }
+.reminder-item.personal { border-left: 3px solid var(--green); }
+.reminder-item.personalfinance { border-left: 3px solid var(--teal); }
+.reminder-item.personalhealth { border-left: 3px solid #34d399; }
+.reminder-item.workconfidential { border-left: 3px solid var(--red); }
+.reminder-item.leisure { border-left: 3px solid #a78bfa; }
+
+.ri-head {
+  padding: 13px 14px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ri-info { flex: 1; min-width: 0; }
+.ri-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.ri-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ri-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+.ri-cat {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.cat-critical { background: var(--red-dim); color: var(--red); }
+.cat-urgent { background: var(--orange-dim); color: var(--orange); }
+.cat-important { background: var(--gold-dim); color: var(--gold); }
+.cat-followup { background: var(--purple-dim); color: var(--purple); }
+.cat-routine { background: var(--blue-dim); color: var(--blue); }
+.cat-personal { background: var(--green-dim); color: var(--green); }
+.cat-personalfinance { background: var(--teal-dim); color: var(--teal); }
+.cat-personalhealth { background: rgba(52,211,153,0.12); color: #34d399; }
+.cat-workconfidential { background: var(--red-dim); color: var(--red); }
+.cat-leisure { background: rgba(167,139,250,0.12); color: #a78bfa; }
+
+.ri-status {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.status-pending { background: var(--orange-dim); color: var(--orange); }
+.status-inprogress { background: var(--blue-dim); color: var(--blue); }
+.status-done { background: var(--green-dim); color: var(--green); }
+.status-delegated { background: var(--purple-dim); color: var(--purple); }
+.status-snoozed { background: var(--bg4); color: var(--text3); }
+
+.ri-actions {
+  padding: 10px 14px 13px;
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+}
+.ri-btn {
+  flex: 1;
+  min-width: calc(33% - 5px);
+  padding: 8px 4px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.ri-btn:active { background: var(--bg4); }
+.ri-btn.done { border-color: rgba(74,222,128,0.3); color: var(--green); }
+.ri-btn.snooze { border-color: rgba(251,146,60,0.3); color: var(--orange); }
+.ri-btn.delegate { border-color: rgba(192,132,252,0.3); color: var(--purple); }
+
+/* ── EMPTY STATE ── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: var(--text3);
+  text-align: center;
+}
+.empty .e-icon { font-size: 36px; opacity: 0.4; }
+.empty .e-text { font-size: 13px; line-height: 1.5; }
+
+/* ── FORM ELEMENTS ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.field input, .field select, .field textarea {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--gold);
+}
+.field select option { background: var(--bg3); }
+.field textarea { resize: none; min-height: 80px; line-height: 1.5; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+  color: #0a0a0f;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-secondary {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+.btn-secondary:active { background: var(--bg4); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-top: 1px solid var(--border2);
+  width: 100%;
+  padding: 20px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 85dvh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto -6px;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: calc(var(--nav-h) + 16px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.25s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; }
+
+/* ── SETTINGS ── */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-info {}
+.setting-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.setting-desc {
+  font-size: 12px;
+  color: var(--text3);
+}
+.toggle {
+  width: 48px; height: 26px;
+  border-radius: 13px;
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--gold); border-color: var(--gold); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  top: 2px; left: 2px;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(22px); }
+
+/* ── SUMMARY PAGE ── */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip {
+  flex-shrink: 0;
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-chip.active {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── TASK SUMMARY ITEM ── */
+.task-row {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.task-row:last-child { border-bottom: none; }
+.task-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.task-content { flex: 1; min-width: 0; }
+.task-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+.task-meta {
+  font-size: 11px;
+  color: var(--text3);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── VOICE PAGE SPECIFIC ── */
+.ai-response {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  display: none;
+}
+.ai-response.visible { display: block; }
+.ai-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+/* ── CATEGORY PILLS ── */
+.cat-row {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.cat-row::-webkit-scrollbar { display: none; }
+.cat-pill {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.cat-pill.selected {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-logo">🤝</div>
+      <div>
+        <div class="header-title">Amicus</div>
+        <div class="header-sub">Your Trusted Friend</div>
+      </div>
+    </div>
+    <div class="header-time" id="headerTime"></div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages">
+
+    <!-- ══ PAGE: VOICE ══ -->
+    <div class="page active" id="page-voice">
+
+      <div class="card">
+        <div class="mic-wrap">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙️</button>
+          <div class="mic-hint" id="micHint">Tap and speak naturally.<br>Amicus will understand.</div>
+          <div class="mic-transcript" id="micTranscript"></div>
+        </div>
+      </div>
+
+      <div class="ai-response" id="aiResponse">
+        <div class="ai-label">Amicus</div>
+        <div id="aiResponseText"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Quick Actions</span></div>
+        <div class="card-body">
+          <div class="quick-grid">
+            <button class="quick-btn" onclick="quickAction('reminder')">
+              <span class="qb-icon">⏰</span>
+              <span class="qb-label">New Reminder</span>
+              <span class="qb-hint">Set by voice or form</span>
+            </button>
+            <button class="quick-btn" onclick="quickAction('note')">
+              <span class="qb-icon">📝</span>
+              <span class="qb-label">Quick Note</span>
+              <span class="qb-hint">Save a thought</span>
+            </button>
+            <button class="quick-btn" onclick="quickAction('summary')">
+              <span class="qb-icon">📋</span>
+              <span class="qb-label">Today's Summary</span>
+              <span class="qb-hint">What's pending</span>
+            </button>
+            <button class="quick-btn" onclick="quickAction('delegate')">
+              <span class="qb-icon">👤</span>
+              <span class="qb-label">Delegate</span>
+              <span class="qb-hint">Draft message</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes list -->
+      <div class="card" id="notesCard" style="display:none">
+        <div class="card-header">
+          <span class="card-title">Notes</span>
+          <span style="font-size:12px;color:var(--text3);cursor:pointer" onclick="clearNotes()">Clear all</span>
+        </div>
+        <div id="notesList"></div>
+      </div>
+
+    </div>
+
+    <!-- ══ PAGE: REMINDERS ══ -->
+    <div class="page" id="page-reminders">
+
+      <button class="btn btn-primary" onclick="openAddReminder()">＋ Add Reminder</button>
+
+      <div id="overdueSection" style="display:none">
+        <div style="font-size:11px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">⚠ Overdue</div>
+        <div id="overdueList" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Upcoming</div>
+        <div id="remindersList" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="empty">
+            <div class="e-icon">⏰</div>
+            <div class="e-text">No reminders yet.<br>Tap Add or speak to Amicus.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ PAGE: SUMMARY ══ -->
+    <div class="page" id="page-summary">
+
+      <div class="filter-row" id="statusFilters">
+        <div class="filter-chip active" data-filter="all" onclick="filterTasks(this,'status')">All</div>
+        <div class="filter-chip" data-filter="pending" onclick="filterTasks(this,'status')">Pending</div>
+        <div class="filter-chip" data-filter="inprogress" onclick="filterTasks(this,'status')">In Progress</div>
+        <div class="filter-chip" data-filter="done" onclick="filterTasks(this,'status')">Done</div>
+        <div class="filter-chip" data-filter="delegated" onclick="filterTasks(this,'status')">Delegated</div>
+        <div class="filter-chip" data-filter="snoozed" onclick="filterTasks(this,'status')">Snoozed</div>
+      </div>
+
+      <div class="filter-row" id="catFilters">
+        <div class="filter-chip active" data-filter="all" onclick="filterTasks(this,'cat')">All Categories</div>
+        <div class="filter-chip" data-filter="Critical" onclick="filterTasks(this,'cat')">Critical</div>
+        <div class="filter-chip" data-filter="Urgent" onclick="filterTasks(this,'cat')">Urgent</div>
+        <div class="filter-chip" data-filter="Important" onclick="filterTasks(this,'cat')">Important</div>
+        <div class="filter-chip" data-filter="Personal" onclick="filterTasks(this,'cat')">Personal</div>
+        <div class="filter-chip" data-filter="Work — Confidential" onclick="filterTasks(this,'cat')">Work</div>
+        <div class="filter-chip" data-filter="Personal Health" onclick="filterTasks(this,'cat')">Health</div>
+        <div class="filter-chip" data-filter="Personal Finance" onclick="filterTasks(this,'cat')">Finance</div>
+        <div class="filter-chip" data-filter="Leisure" onclick="filterTasks(this,'cat')">Leisure</div>
+      </div>
+
+      <div class="card">
+        <div id="taskSummaryList">
+          <div class="empty">
+            <div class="e-icon">📋</div>
+            <div class="e-text">No tasks yet. Create reminders<br>and they'll appear here.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ PAGE: SETTINGS ══ -->
+    <div class="page" id="page-settings">
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">AI Engine</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="field">
+            <label>Gemini API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="AIza..." oninput="saveSettings()">
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.5;">
+            Get your free key at <span style="color:var(--gold)">aistudio.google.com</span> → Get API Key → Create API Key
+          </div>
+          <button class="btn btn-secondary" onclick="testGemini()">Test Connection</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notifications</span></div>
+        <div class="card-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Reminder Alerts</div>
+              <div class="setting-desc" id="notifDesc">Permission not yet granted</div>
+            </div>
+            <button class="btn btn-secondary" style="width:auto;padding:8px 14px;font-size:13px;" onclick="requestNotifPermission()">Enable</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Morning Summary</div>
+              <div class="setting-desc">Daily digest of pending tasks</div>
+            </div>
+            <div class="toggle" id="mornToggle" onclick="toggleMorningSummary()"></div>
+          </div>
+          <div class="field" id="mornTimeField" style="display:none">
+            <label>Summary Time</label>
+            <input type="time" id="mornTime" value="08:00" oninput="saveSettings()">
+          </div>
+          <button class="btn btn-secondary" style="margin-top:10px;" onclick="sendTestNotif()">Send Test Notification</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Data</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:13px;color:var(--text2);line-height:1.5;" id="dataStats">Loading stats...</div>
+          <button class="btn btn-secondary" onclick="exportData()">Export All Data (JSON)</button>
+          <button class="btn btn-secondary" style="color:var(--red);border-color:rgba(248,113,113,0.3)" onclick="clearAllData()">Clear All Data</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;font-size:12px;color:var(--text3);padding:8px 0;">
+        Amicus v2.0 · MPM711 · All data stored locally
+      </div>
+
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('voice',this)">
+      <span class="icon">🎙️</span>
+      <span>Voice</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('reminders',this)">
+      <span class="icon">⏰</span>
+      <span>Reminders</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('summary',this)">
+      <span class="icon">📋</span>
+      <span>Summary</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('settings',this)">
+      <span class="icon">⚙️</span>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<!-- ══ ADD REMINDER MODAL ══ -->
+<div class="modal-overlay" id="addReminderModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Reminder</div>
+
+    <div class="field">
+      <label>What do you need to remember?</label>
+      <textarea id="newReminderText" placeholder="e.g. Call Dr Vivek about test results"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Category</label>
+      <select id="newReminderCat">
+        <option value="Critical">Critical</option>
+        <option value="Urgent">Urgent</option>
+        <option value="Important" selected>Important</option>
+        <option value="Follow-up">Follow-up</option>
+        <option value="Routine">Routine</option>
+        <option value="Personal">Personal</option>
+        <option value="Personal Finance">Personal Finance</option>
+        <option value="Personal Health">Personal Health</option>
+        <option value="Work — Confidential">Work — Confidential</option>
+        <option value="Leisure">Leisure</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="newReminderDate">
+    </div>
+
+    <div class="field">
+      <label>Time</label>
+      <input type="time" id="newReminderTime">
+    </div>
+
+    <button class="btn btn-primary" onclick="saveReminder()">Save Reminder</button>
+    <button class="btn btn-secondary" onclick="closeModal('addReminderModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ REMINDER FIRED MODAL ══ -->
+<div class="modal-overlay" id="reminderFireModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="font-size:13px;color:var(--gold);font-weight:600;text-align:center;text-transform:uppercase;letter-spacing:0.8px;">Reminder</div>
+    <div class="modal-title" id="rfTitle" style="font-size:16px;line-height:1.4;"></div>
+    <div style="font-size:12px;color:var(--text3);text-align:center;" id="rfMeta"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <button class="ri-btn done" onclick="reminderAction('done')">✅ Done</button>
+      <button class="ri-btn snooze" onclick="reminderAction('snooze1h')">⏰ 1 Hour</button>
+      <button class="ri-btn snooze" onclick="reminderAction('snoozetomorrow')">📅 Tomorrow</button>
+      <button class="ri-btn" onclick="reminderAction('inprogress')">🔄 In Progress</button>
+      <button class="ri-btn" onclick="reminderAction('notstarted')">⭕ Not Started</button>
+      <button class="ri-btn delegate" onclick="reminderAction('delegate')">👤 Delegate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DELEGATE MODAL ══ -->
+<div class="modal-overlay" id="delegateModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Delegate Task</div>
+    <div class="field">
+      <label>Who are you delegating to?</label>
+      <input type="text" id="delegateName" placeholder="Name">
+    </div>
+    <div class="field">
+      <label>Any special instructions? (optional)</label>
+      <textarea id="delegateNotes" placeholder="e.g. Please confirm by Friday" style="min-height:60px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Send via</label>
+      <select id="delegateVia">
+        <option value="whatsapp">WhatsApp</option>
+        <option value="email">Email</option>
+      </select>
+    </div>
+    <div id="delegateContact" style="display:none">
+      <div class="field">
+        <label id="delegateContactLabel">Phone / Email</label>
+        <input type="text" id="delegateContactInput" placeholder="">
+      </div>
+    </div>
+    <div id="delegateDraft" style="display:none">
+      <div class="field">
+        <label>Draft Message (review before sending)</label>
+        <textarea id="delegateDraftText" style="min-height:100px;"></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="delegateBtn" onclick="generateDelegate()">Generate Message</button>
+    <button class="btn btn-secondary" onclick="closeModal('delegateModal')">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+let reminders = [];
+let notes = [];
+let settings = {};
+let activeReminderId = null;
+let recognition = null;
+let isListening = false;
+
+const CATEGORIES = ['Critical','Urgent','Important','Follow-up','Routine','Personal','Personal Finance','Personal Health','Work — Confidential','Leisure'];
+const CAT_KEYS = {
+  'Critical':'critical','Urgent':'urgent','Important':'important',
+  'Follow-up':'followup','Routine':'routine','Personal':'personal',
+  'Personal Finance':'personalfinance','Personal Health':'personalhealth',
+  'Work — Confidential':'workconfidential','Leisure':'leisure'
+};
+
+// ── Load/Save ──
+function loadData() {
+  try { reminders = JSON.parse(localStorage.getItem('amicus_reminders') || '[]'); } catch(e){ reminders=[]; }
+  try { notes = JSON.parse(localStorage.getItem('amicus_notes') || '[]'); } catch(e){ notes=[]; }
+  try { settings = JSON.parse(localStorage.getItem('amicus_settings') || '{}'); } catch(e){ settings={}; }
+}
+function saveData() {
+  localStorage.setItem('amicus_reminders', JSON.stringify(reminders));
+}
+function saveNotes() {
+  localStorage.setItem('amicus_notes', JSON.stringify(notes));
+}
+function saveSettings() {
+  settings.apiKey = document.getElementById('apiKeyInput').value;
+  settings.mornTime = document.getElementById('mornTime').value;
+  localStorage.setItem('amicus_settings', JSON.stringify(settings));
+}
+
+// ── Clock ──
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  const d = now.toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+  document.getElementById('headerTime').innerHTML = t + '<br><span style="font-size:10px">' + d + '</span>';
+}
+
+// ── Nav ──
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'reminders') renderReminders();
+  if (id === 'summary') renderSummary();
+  if (id === 'settings') renderSettings();
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Modal ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ══════════════════════════════════════════════
+//  VOICE / MIC
+// ══════════════════════════════════════════════
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-IN';
+
+  recognition.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    const el = document.getElementById('micTranscript');
+    el.textContent = final || interim;
+    el.classList.add('visible');
+    if (final) {
+      stopListening();
+      processVoiceCommand(final.trim());
+    }
+  };
+  recognition.onend = () => { if (isListening) stopListening(); };
+  recognition.onerror = (e) => {
+    stopListening();
+    if (e.error !== 'no-speech') showToast('Mic error: ' + e.error);
+  };
+}
+
+function toggleMic() {
+  if (isListening) stopListening();
+  else startListening();
+}
+function startListening() {
+  if (!recognition) { showToast('Voice not supported in this browser'); return; }
+  isListening = true;
+  document.getElementById('micBtn').classList.add('listening');
+  document.getElementById('micHint').textContent = 'Listening... speak now';
+  document.getElementById('micTranscript').textContent = '';
+  document.getElementById('micTranscript').classList.add('visible');
+  recognition.start();
+}
+function stopListening() {
+  isListening = false;
+  document.getElementById('micBtn').classList.remove('listening');
+  document.getElementById('micHint').textContent = 'Tap and speak naturally.\nAmicus will understand.';
+  try { recognition.stop(); } catch(e){}
+}
+
+// ── Process command ──
+async function processVoiceCommand(text) {
+  if (!text) return;
+  const key = settings.apiKey || document.getElementById('apiKeyInput').value;
+  if (!key) {
+    // Basic local parsing
+    parseCommandLocally(text);
+    return;
+  }
+  showToast('Thinking...');
+  try {
+    const now = new Date();
+    const prompt = `You are Amicus, a personal assistant. The user said: "${text}"
+
+Current date/time: ${now.toLocaleString('en-IN')}
+
+Parse their intent and respond with a JSON object only (no markdown, no backticks):
+{
+  "intent": "reminder" | "note" | "summary" | "delegate" | "chat",
+  "response": "What you say back to the user (friendly, brief)",
+  "reminder": {
+    "title": "task title",
+    "category": "one of: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure",
+    "datetime": "ISO 8601 datetime string (null if no specific time)",
+    "snoozeUntil": null
+  }
+}
+Only include the reminder object if intent is "reminder". For notes, just use intent "note" with the response.`;
+
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text: prompt}]}]})
+    });
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) { parsed = {intent:'chat', response: raw.substring(0,200)}; }
+
+    showAIResponse(parsed.response);
+
+    if (parsed.intent === 'reminder' && parsed.reminder) {
+      const r = {
+        id: Date.now().toString(),
+        title: parsed.reminder.title || text,
+        category: parsed.reminder.category || 'Important',
+        datetime: parsed.reminder.datetime || null,
+        status: 'pending',
+        created: new Date().toISOString(),
+        followupSent: false,
+        graceSent: false
+      };
+      reminders.unshift(r);
+      saveData();
+      if (r.datetime) scheduleNotification(r);
+      showToast('Reminder saved ✓');
+    } else if (parsed.intent === 'note') {
+      const n = { id: Date.now().toString(), text, created: new Date().toISOString() };
+      notes.unshift(n);
+      saveNotes();
+      showToast('Note saved ✓');
+      renderNotes();
+    }
+
+  } catch(err) {
+    parseCommandLocally(text);
+  }
+}
+
+function parseCommandLocally(text) {
+  const lower = text.toLowerCase();
+  if (lower.includes('remind') || lower.includes('reminder')) {
+    const r = {
+      id: Date.now().toString(),
+      title: text,
+      category: 'Important',
+      datetime: extractDatetime(text),
+      status: 'pending',
+      created: new Date().toISOString(),
+      followupSent: false,
+      graceSent: false
+    };
+    reminders.unshift(r);
+    saveData();
+    if (r.datetime) scheduleNotification(r);
+    showAIResponse('Got it! Reminder saved: "' + r.title + '"');
+    showToast('Reminder saved ✓');
+  } else {
+    const n = { id: Date.now().toString(), text, created: new Date().toISOString() };
+    notes.unshift(n);
+    saveNotes();
+    showAIResponse('Note saved: "' + text + '"');
+    showToast('Note saved ✓');
+    renderNotes();
+  }
+}
+
+function extractDatetime(text) {
+  const lower = text.toLowerCase();
+  const now = new Date();
+  // "tomorrow at X"
+  const tmMatch = lower.match(/tomorrow\s+at\s+(\d+)(?::(\d+))?\s*(am|pm)?/i);
+  if (tmMatch) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    let h = parseInt(tmMatch[1]);
+    const m = parseInt(tmMatch[2] || '0');
+    const ap = tmMatch[3];
+    if (ap === 'pm' && h < 12) h += 12;
+    if (ap === 'am' && h === 12) h = 0;
+    d.setHours(h, m, 0, 0);
+    return d.toISOString();
+  }
+  // "today at X"
+  const todMatch = lower.match(/today\s+at\s+(\d+)(?::(\d+))?\s*(am|pm)?/i);
+  if (todMatch) {
+    const d = new Date(now);
+    let h = parseInt(todMatch[1]);
+    const m = parseInt(todMatch[2] || '0');
+    const ap = todMatch[3];
+    if (ap === 'pm' && h < 12) h += 12;
+    if (ap === 'am' && h === 12) h = 0;
+    d.setHours(h, m, 0, 0);
+    return d.toISOString();
+  }
+  return null;
+}
+
+function showAIResponse(text) {
+  const el = document.getElementById('aiResponse');
+  document.getElementById('aiResponseText').textContent = text;
+  el.classList.add('visible');
+}
+
+// ── Quick Actions ──
+function quickAction(type) {
+  if (type === 'reminder') { openAddReminder(); }
+  else if (type === 'note') { startListening(); showToast('Speak your note...'); }
+  else if (type === 'summary') { showPage('summary', document.querySelectorAll('.nav-btn')[2]); }
+  else if (type === 'delegate') { openDelegate(null); }
+}
+
+// ══════════════════════════════════════════════
+//  REMINDERS
+// ══════════════════════════════════════════════
+function openAddReminder() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('newReminderDate').value = today;
+  document.getElementById('newReminderTime').value = '09:00';
+  document.getElementById('newReminderText').value = '';
+  openModal('addReminderModal');
+}
+
+function saveReminder() {
+  const text = document.getElementById('newReminderText').value.trim();
+  if (!text) { showToast('Please enter a reminder'); return; }
+  const date = document.getElementById('newReminderDate').value;
+  const time = document.getElementById('newReminderTime').value;
+  const cat = document.getElementById('newReminderCat').value;
+
+  let dt = null;
+  if (date) {
+    dt = new Date(date + 'T' + (time || '09:00') + ':00');
+    if (isNaN(dt)) dt = null;
+    else dt = dt.toISOString();
+  }
+
+  const r = {
+    id: Date.now().toString(),
+    title: text,
+    category: cat,
+    datetime: dt,
+    status: 'pending',
+    created: new Date().toISOString(),
+    followupSent: false,
+    graceSent: false
+  };
+  reminders.unshift(r);
+  saveData();
+  if (dt) scheduleNotification(r);
+  closeModal('addReminderModal');
+  renderReminders();
+  showToast('Reminder saved ✓');
+}
+
+function renderReminders() {
+  const now = new Date();
+  const overdue = reminders.filter(r => r.datetime && new Date(r.datetime) < now && r.status === 'pending');
+  const upcoming = reminders.filter(r => !overdue.includes(r) && r.status !== 'done');
+
+  const overdueSection = document.getElementById('overdueSection');
+  const overdueList = document.getElementById('overdueList');
+  if (overdue.length > 0) {
+    overdueSection.style.display = 'block';
+    overdueList.innerHTML = overdue.map(r => reminderHTML(r)).join('');
+  } else {
+    overdueSection.style.display = 'none';
+  }
+
+  const list = document.getElementById('remindersList');
+  if (upcoming.length === 0 && overdue.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="e-icon">⏰</div><div class="e-text">No reminders yet.<br>Tap Add or speak to Amicus.</div></div>';
+  } else if (upcoming.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="e-icon">✅</div><div class="e-text">All caught up!</div></div>';
+  } else {
+    list.innerHTML = upcoming.map(r => reminderHTML(r)).join('');
+  }
+}
+
+function reminderHTML(r) {
+  const catKey = CAT_KEYS[r.category] || 'routine';
+  const dt = r.datetime ? new Date(r.datetime).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'No time set';
+  return `<div class="reminder-item ${catKey}">
+    <div class="ri-head">
+      <div class="ri-info">
+        <div class="ri-title">${r.title}</div>
+        <div class="ri-meta">
+          <span class="ri-time">${dt}</span>
+          <span class="ri-cat cat-${catKey}">${r.category}</span>
+          <span class="ri-status status-${(r.status||'pending').replace(' ','')}">${r.status || 'Pending'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="ri-actions">
+      <button class="ri-btn done" onclick="markReminderAction('${r.id}','done')">✅ Done</button>
+      <button class="ri-btn snooze" onclick="markReminderAction('${r.id}','snooze1h')">⏰ 1 Hr</button>
+      <button class="ri-btn snooze" onclick="markReminderAction('${r.id}','snoozetomorrow')">📅 Tomorrow</button>
+      <button class="ri-btn" onclick="markReminderAction('${r.id}','inprogress')">🔄 In Progress</button>
+      <button class="ri-btn" onclick="markReminderAction('${r.id}','notstarted')">⭕ Not Started</button>
+      <button class="ri-btn delegate" onclick="openDelegate('${r.id}')">👤 Delegate</button>
+    </div>
+  </div>`;
+}
+
+function markReminderAction(id, action) {
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  if (action === 'done') {
+    r.status = 'done';
+    r.doneAt = new Date().toISOString();
+    // Schedule grace follow-up 1 hour later
+    if (!r.graceSent) {
+      setTimeout(() => fireFollowUp(r, true), 60 * 60 * 1000);
+    }
+    showToast('Marked done ✓ — follow-up in 1 hour');
+  } else if (action === 'snooze1h') {
+    r.status = 'snoozed';
+    const newDt = new Date(Date.now() + 60*60*1000);
+    r.datetime = newDt.toISOString();
+    scheduleNotification(r);
+    showToast('Snoozed 1 hour');
+  } else if (action === 'snoozetomorrow') {
+    r.status = 'snoozed';
+    const newDt = new Date();
+    newDt.setDate(newDt.getDate() + 1);
+    newDt.setHours(9, 0, 0, 0);
+    r.datetime = newDt.toISOString();
+    scheduleNotification(r);
+    showToast('Snoozed to tomorrow 9am');
+  } else if (action === 'inprogress') {
+    r.status = 'inprogress';
+    showToast('Marked in progress');
+  } else if (action === 'notstarted') {
+    r.status = 'pending';
+    showToast('Marked not started');
+  }
+  saveData();
+  renderReminders();
+  renderSummaryIfVisible();
+}
+
+// ── Active reminder actions (from notification modal) ──
+function reminderAction(action) {
+  if (!activeReminderId) return;
+  closeModal('reminderFireModal');
+  markReminderAction(activeReminderId, action);
+  if (action === 'delegate') openDelegate(activeReminderId);
+}
+
+// ══════════════════════════════════════════════
+//  FOLLOW-UP LOGIC
+// ══════════════════════════════════════════════
+function fireFollowUp(r, isGrace) {
+  if (isGrace && r.graceSent) return;
+  if (!isGrace && r.followupSent) return;
+
+  if (isGrace) {
+    r.graceSent = true;
+    const msg = `You marked "${r.title}" complete — all good, or anything still pending?`;
+    fireReminderUI(r, msg);
+  } else {
+    r.followupSent = true;
+    const msg = `Just checking in on "${r.title}" — done, or still pending?`;
+    fireReminderUI(r, msg);
+  }
+  saveData();
+}
+
+function fireReminderUI(r, customMsg) {
+  activeReminderId = r.id;
+  document.getElementById('rfTitle').textContent = customMsg || r.title;
+  document.getElementById('rfMeta').textContent = r.category + ' · ' + (r.datetime ? new Date(r.datetime).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '');
+  openModal('reminderFireModal');
+  // Also fire browser notification if permission granted
+  if (Notification.permission === 'granted') {
+    new Notification('Amicus', { body: customMsg || r.title, icon: 'icon-192.png' });
+  }
+}
+
+// ══════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════
+function scheduleNotification(r) {
+  if (!r.datetime) return;
+  const delay = new Date(r.datetime) - Date.now();
+  if (delay <= 0) return;
+  if (delay < 2147483647) {
+    setTimeout(() => {
+      const current = reminders.find(x => x.id === r.id);
+      if (!current || current.status === 'done') return;
+      fireReminderUI(current);
+      // Schedule follow-up 1 hour later
+      if (!current.followupSent) {
+        setTimeout(() => fireFollowUp(current, false), 60 * 60 * 1000);
+      }
+    }, delay);
+  }
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('Notifications not supported'); return; }
+  Notification.requestPermission().then(p => {
+    document.getElementById('notifDesc').textContent = p === 'granted' ? '✓ Enabled' : 'Permission denied';
+    if (p === 'granted') showToast('Notifications enabled ✓');
+  });
+}
+
+function sendTestNotif() {
+  if (Notification.permission !== 'granted') {
+    requestNotifPermission();
+    return;
+  }
+  new Notification('Amicus', { body: 'Test notification — everything is working!', icon: 'icon-192.png' });
+  showToast('Test notification sent');
+}
+
+function toggleMorningSummary() {
+  const t = document.getElementById('mornToggle');
+  settings.morningSummary = !settings.morningSummary;
+  t.classList.toggle('on', settings.morningSummary);
+  document.getElementById('mornTimeField').style.display = settings.morningSummary ? 'flex' : 'none';
+  saveSettings();
+}
+
+// ══════════════════════════════════════════════
+//  DELEGATE
+// ══════════════════════════════════════════════
+let delegateReminderId = null;
+
+function openDelegate(reminderId) {
+  delegateReminderId = reminderId;
+  document.getElementById('delegateName').value = '';
+  document.getElementById('delegateNotes').value = '';
+  document.getElementById('delegateDraft').style.display = 'none';
+  document.getElementById('delegateContact').style.display = 'none';
+  document.getElementById('delegateBtn').textContent = 'Generate Message';
+  document.getElementById('delegateBtn').onclick = generateDelegate;
+  openModal('delegateModal');
+}
+
+async function generateDelegate() {
+  const name = document.getElementById('delegateName').value.trim();
+  const notes = document.getElementById('delegateNotes').value.trim();
+  const via = document.getElementById('delegateVia').value;
+
+  if (!name) { showToast('Please enter a name'); return; }
+
+  // Show contact field
+  document.getElementById('delegateContact').style.display = 'flex';
+  document.getElementById('delegateContactLabel').textContent = via === 'whatsapp' ? 'WhatsApp Number (with country code)' : 'Email Address';
+  document.getElementById('delegateContactInput').placeholder = via === 'whatsapp' ? '+91 98xxx xxxxx' : 'email@example.com';
+
+  const r = delegateReminderId ? reminders.find(x => x.id === delegateReminderId) : null;
+  const taskDesc = r ? r.title : 'the delegated task';
+
+  const key = settings.apiKey;
+  let draft = '';
+
+  if (key) {
+    showToast('Drafting message...');
+    try {
+      const prompt = `Draft a short, professional ${via === 'whatsapp' ? 'WhatsApp message' : 'email'} delegating the following task to ${name}.
+Task: ${taskDesc}
+Additional notes: ${notes || 'none'}
+The message should be from me, natural and direct. Just the message text, no subject line needed for WhatsApp.${via === 'email' ? ' Include a subject line at the start prefixed with "Subject: "' : ''}`;
+
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      });
+      const data = await res.json();
+      draft = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } catch(e) { draft = ''; }
+  }
+
+  if (!draft) {
+    draft = `Hi ${name},\n\nCould you please handle the following: ${taskDesc}.\n${notes ? notes + '\n' : ''}\nPlease confirm once done.\n\nThanks`;
+  }
+
+  document.getElementById('delegateDraftText').value = draft;
+  document.getElementById('delegateDraft').style.display = 'flex';
+  document.getElementById('delegateBtn').textContent = via === 'whatsapp' ? 'Open WhatsApp' : 'Open Email';
+  document.getElementById('delegateBtn').onclick = sendDelegate;
+
+  // Mark as delegated
+  if (r) {
+    r.status = 'delegated';
+    r.delegatedTo = name;
+    saveData();
+    renderSummaryIfVisible();
+  }
+}
+
+function sendDelegate() {
+  const via = document.getElementById('delegateVia').value;
+  const contact = document.getElementById('delegateContactInput').value.trim();
+  const text = document.getElementById('delegateDraftText').value;
+
+  if (via === 'whatsapp') {
+    const phone = contact.replace(/\D/g, '');
+    const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+  } else {
+    const lines = text.split('\n');
+    let subject = 'Task Delegation';
+    let body = text;
+    if (lines[0].startsWith('Subject: ')) {
+      subject = lines[0].replace('Subject: ', '');
+      body = lines.slice(1).join('\n').trim();
+    }
+    window.open('mailto:' + contact + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), '_blank');
+  }
+  closeModal('delegateModal');
+  showToast('Opening ' + (via === 'whatsapp' ? 'WhatsApp' : 'email') + '...');
+}
+
+// ══════════════════════════════════════════════
+//  SUMMARY PAGE
+// ══════════════════════════════════════════════
+let statusFilter = 'all';
+let catFilter = 'all';
+
+function filterTasks(el, type) {
+  if (type === 'status') {
+    document.querySelectorAll('#statusFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    statusFilter = el.dataset.filter;
+  } else {
+    document.querySelectorAll('#catFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    catFilter = el.dataset.filter;
+  }
+  el.classList.add('active');
+  renderSummary();
+}
+
+function renderSummary() {
+  let filtered = [...reminders];
+  if (statusFilter !== 'all') filtered = filtered.filter(r => r.status === statusFilter);
+  if (catFilter !== 'all') filtered = filtered.filter(r => r.category === catFilter);
+
+  const list = document.getElementById('taskSummaryList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="e-icon">📋</div><div class="e-text">No tasks match this filter.</div></div>';
+    return;
+  }
+
+  const colors = {
+    critical:'var(--red)',urgent:'var(--orange)',important:'var(--gold)',
+    followup:'var(--purple)',routine:'var(--blue)',personal:'var(--green)',
+    personalfinance:'var(--teal)',personalhealth:'#34d399',
+    workconfidential:'var(--red)',leisure:'#a78bfa'
+  };
+
+  list.innerHTML = filtered.map(r => {
+    const catKey = CAT_KEYS[r.category] || 'routine';
+    const color = colors[catKey] || 'var(--text3)';
+    const dt = r.datetime ? new Date(r.datetime).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    return `<div class="task-row">
+      <div class="task-dot" style="background:${color}"></div>
+      <div class="task-content">
+        <div class="task-title">${r.title}</div>
+        <div class="task-meta">
+          <span>${r.category}</span>
+          <span>${dt}</span>
+          <span class="ri-status status-${(r.status||'pending').replace(' ','')}">${r.status || 'pending'}</span>
+          ${r.delegatedTo ? '<span>→ ' + r.delegatedTo + '</span>' : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSummaryIfVisible() {
+  if (document.getElementById('page-summary').classList.contains('active')) renderSummary();
+}
+
+// ══════════════════════════════════════════════
+//  NOTES
+// ══════════════════════════════════════════════
+function renderNotes() {
+  const card = document.getElementById('notesCard');
+  const list = document.getElementById('notesList');
+  if (notes.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = notes.slice(0,10).map(n => {
+    const dt = new Date(n.created).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="task-row">
+      <div class="task-dot" style="background:var(--text3)"></div>
+      <div class="task-content">
+        <div class="task-title" style="font-weight:400">${n.text}</div>
+        <div class="task-meta"><span>${dt}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function clearNotes() {
+  if (!confirm('Clear all notes?')) return;
+  notes = [];
+  saveNotes();
+  renderNotes();
+}
+
+// ══════════════════════════════════════════════
+//  SETTINGS PAGE
+// ══════════════════════════════════════════════
+function renderSettings() {
+  document.getElementById('apiKeyInput').value = settings.apiKey || '';
+  document.getElementById('mornTime').value = settings.mornTime || '08:00';
+  document.getElementById('mornToggle').classList.toggle('on', !!settings.morningSummary);
+  document.getElementById('mornTimeField').style.display = settings.morningSummary ? 'flex' : 'none';
+  document.getElementById('notifDesc').textContent = Notification.permission === 'granted' ? '✓ Enabled' : 'Tap Enable to allow notifications';
+
+  const total = reminders.length;
+  const done = reminders.filter(r=>r.status==='done').length;
+  const pending = reminders.filter(r=>r.status==='pending'||r.status==='inprogress').length;
+  document.getElementById('dataStats').innerHTML =
+    `Total reminders: <b>${total}</b><br>Done: <b>${done}</b> · Pending: <b>${pending}</b><br>Notes: <b>${notes.length}</b>`;
+}
+
+async function testGemini() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { showToast('Enter your API key first'); return; }
+  saveSettings();
+  showToast('Testing...');
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text:'Say "Amicus connected!" and nothing else.'}]}]})
+    });
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (reply) showToast('✓ Connected: ' + reply.substring(0,40));
+    else showToast('Error — check your key');
+  } catch(e) { showToast('Connection failed'); }
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({reminders, notes}, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'amicus-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function clearAllData() {
+  if (!confirm('Clear ALL data? This cannot be undone.')) return;
+  localStorage.clear();
+  reminders = []; notes = []; settings = {};
+  showToast('All data cleared');
+  renderReminders();
+  renderNotes();
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function init() {
+  loadData();
+  setupRecognition();
+  updateClock();
+  setInterval(updateClock, 30000);
+  renderNotes();
+
+  // Set today as default date in reminder form
+  document.getElementById('newReminderDate').value = new Date().toISOString().split('T')[0];
+
+  // Reschedule all pending reminders on load
+  reminders.forEach(r => {
+    if (r.datetime && r.status === 'pending') scheduleNotification(r);
+  });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+}
+
+init();
+</script>
+</body>
+</html>

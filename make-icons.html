@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Make Amicus Icons</title>
+<style>
+  body { font-family: sans-serif; padding: 30px; background: #111; color: #eee; }
+  button { margin: 10px; padding: 14px 24px; font-size: 16px; border-radius: 10px; border: none; background: #c9a84c; color: #000; font-weight: 600; cursor: pointer; }
+</style>
+</head>
+<body>
+<h2>Amicus — Generate Icons</h2>
+<p>Click each button to download the icon. Then upload both to GitHub.</p>
+<button onclick="makeIcon(192)">Download icon-192.png</button>
+<button onclick="makeIcon(512)">Download icon-512.png</button>
+<canvas id="c" style="display:none"></canvas>
+<script>
+function makeIcon(size) {
+  const c = document.getElementById('c');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#1a1508');
+  grad.addColorStop(1, '#0a0a0f');
+  ctx.fillStyle = grad;
+  roundRect(ctx, 0, 0, size, size, size * 0.22);
+  ctx.fill();
+
+  // Gold ring
+  ctx.strokeStyle = '#c9a84c';
+  ctx.lineWidth = size * 0.03;
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, size * 0.36, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Handshake emoji style — draw letter A
+  ctx.fillStyle = '#c9a84c';
+  ctx.font = `bold ${size * 0.38}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('A', size/2, size/2 + size*0.03);
+
+  const a = document.createElement('a');
+  a.download = 'icon-' + size + '.png';
+  a.href = c.toDataURL('image/png');
+  a.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+</script>
+</body>
+</html>
