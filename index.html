@@ -1077,9 +1077,8 @@ function stopListening() {
 // ── Process command ──
 async function processVoiceCommand(text) {
   if (!text) return;
-  const key = settings.apiKey || document.getElementById('apiKeyInput').value;
+  const key = settings.apiKey || document.getElementById('apiKeyInput').value.trim();
   if (!key) {
-    // Basic local parsing
     parseCommandLocally(text);
     return;
   }
@@ -1089,34 +1088,55 @@ async function processVoiceCommand(text) {
     const prompt = `You are Amicus, a personal assistant. The user said: "${text}"
 
 Current date/time: ${now.toLocaleString('en-IN')}
+Current ISO date: ${now.toISOString()}
 
-Parse their intent and respond with a JSON object only (no markdown, no backticks):
-{
-  "intent": "reminder" | "note" | "summary" | "delegate" | "chat",
-  "response": "What you say back to the user (friendly, brief)",
-  "reminder": {
-    "title": "task title",
-    "category": "one of: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure",
-    "datetime": "ISO 8601 datetime string (null if no specific time)",
-    "snoozeUntil": null
-  }
-}
-Only include the reminder object if intent is "reminder". For notes, just use intent "note" with the response.`;
+Parse their intent. Reply with ONLY a raw JSON object — no markdown, no backticks, no explanation. Example:
+{"intent":"reminder","response":"Got it! Reminder set.","reminder":{"title":"Test Amicus","category":"Important","datetime":"2026-06-02T09:00:00.000Z"}}
+
+Rules:
+- intent must be one of: reminder, note, chat
+- For reminders, always include the reminder object with title, category, datetime (ISO 8601)
+- category must be one of: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure
+- datetime: calculate the correct future datetime based on current time above
+- response: short friendly confirmation`;
 
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({contents:[{parts:[{text: prompt}]}]})
+      body: JSON.stringify({
+        contents: [{parts: [{text: prompt}]}],
+        generationConfig: {temperature: 0.1}
+      })
     });
     const data = await res.json();
+
+    if (data.error) {
+      showToast('API error: ' + (data.error.message || 'check your key'));
+      showAIResponse('Error: ' + (data.error.message || 'API key issue'));
+      return;
+    }
+
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!raw) {
+      showToast('No response from Gemini');
+      parseCommandLocally(text);
+      return;
+    }
+
     let parsed;
     try {
-      const clean = raw.replace(/```json|```/g,'').trim();
+      // Strip any markdown fences
+      let clean = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+      // Find JSON object in the response
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
+      if (start !== -1 && end !== -1) clean = clean.substring(start, end + 1);
       parsed = JSON.parse(clean);
-    } catch(e) { parsed = {intent:'chat', response: raw.substring(0,200)}; }
+    } catch(e) {
+      parsed = {intent:'chat', response: raw.substring(0, 200)};
+    }
 
-    showAIResponse(parsed.response);
+    showAIResponse(parsed.response || 'Done.');
 
     if (parsed.intent === 'reminder' && parsed.reminder) {
       const r = {
@@ -1142,6 +1162,7 @@ Only include the reminder object if intent is "reminder". For notes, just use in
     }
 
   } catch(err) {
+    showToast('Error — saving locally');
     parseCommandLocally(text);
   }
 }
