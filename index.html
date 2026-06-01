@@ -983,7 +983,11 @@ Rules:
       parsed = JSON.parse(clean);
     } catch(e) { parsed = {intent:'chat', response: raw.substring(0,200)}; }
 
-    showAIResponse(parsed.response || 'Done.');
+    // Show only the response text, never raw JSON
+    const displayMsg = (parsed.response && !parsed.response.startsWith('{')) 
+      ? parsed.response 
+      : (parsed.intent === 'reminder' ? 'Got it! Reminder saved.' : 'Done.');
+    showAIResponse(displayMsg);
 
 
     if (window._editingReminderId && parsed.reminder) {
