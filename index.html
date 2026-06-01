@@ -739,6 +739,48 @@ body.dark {
   </div>
 </div>
 
+
+<!-- EDIT REMINDER MODAL -->
+<div class="modal-overlay" id="editReminderModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Reminder</div>
+    <input type="hidden" id="editReminderId">
+    <div class="field">
+      <label>Reminder</label>
+      <textarea id="editReminderText" style="min-height:70px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="editReminderCat">
+        <option value="Critical">Critical</option>
+        <option value="Urgent">Urgent</option>
+        <option value="Important">Important</option>
+        <option value="Follow-up">Follow-up</option>
+        <option value="Routine">Routine</option>
+        <option value="Personal">Personal</option>
+        <option value="Personal Finance">Personal Finance</option>
+        <option value="Personal Health">Personal Health</option>
+        <option value="Work — Confidential">Work — Confidential</option>
+        <option value="Leisure">Leisure</option>
+      </select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" id="editReminderDate"></div>
+    <div class="field"><label>Time</label><input type="time" id="editReminderTime"></div>
+    <div class="field">
+      <label>Repeat</label>
+      <select id="editReminderRepeat">
+        <option value="none">No repeat</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="saveEditReminder()">Save Changes</button>
+    <button class="btn btn-secondary" onclick="closeModal('editReminderModal')">Cancel</button>
+  </div>
+</div>
+
 <script>
 // ══ TIMEZONE: India Standard Time (UTC+5:30) ══
 const IST_OFFSET = 5.5 * 60 * 60 * 1000;
@@ -1156,9 +1198,56 @@ function reminderHTML(r) {
       <button class="ri-btn" onclick="markAction('${r.id}','inprogress')">🔄 In Progress</button>
       <button class="ri-btn" onclick="markAction('${r.id}','notstarted')">⭕ Not Started</button>
       <button class="ri-btn delegate" onclick="openDelegate('${r.id}')">👤 Delegate</button>
-      <button class="ri-btn" style="grid-column:span 3;border-color:rgba(184,134,11,0.35);color:var(--gold);" onclick="editByVoice('${r.id}')">🎙️ Edit by Voice</button>
+      <button class="ri-btn" style="border-color:rgba(184,134,11,0.35);color:var(--gold);" onclick="editByVoice('${r.id}')">🎙️ Voice Edit</button>
+      <button class="ri-btn" style="border-color:rgba(58,95,138,0.35);color:var(--blue);" onclick="openEditReminder('${r.id}')">✏️ Edit</button>
+      <button class="ri-btn" style="border-color:rgba(163,58,58,0.35);color:var(--red);" onclick="deleteReminder('${r.id}')">🗑️ Delete</button>
     </div>
   </div>`;
+}
+
+function deleteReminder(id) {
+  if (!confirm('Delete this reminder?')) return;
+  reminders = reminders.filter(r => r.id !== id);
+  saveData(); renderReminders(); renderSummaryIfVisible();
+  showToast('Reminder deleted');
+}
+
+function openEditReminder(id) {
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('editReminderId').value = id;
+  document.getElementById('editReminderText').value = r.title;
+  document.getElementById('editReminderCat').value = r.category || 'Important';
+  document.getElementById('editReminderRepeat').value = r.repeat || 'none';
+  if (r.datetime) {
+    const d = new Date(r.datetime);
+    document.getElementById('editReminderDate').value = d.toLocaleDateString('en-CA', {timeZone:'Asia/Kolkata'});
+    document.getElementById('editReminderTime').value = d.toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hour12:false});
+  } else {
+    document.getElementById('editReminderDate').value = todayIST();
+    document.getElementById('editReminderTime').value = '09:00';
+  }
+  openModal('editReminderModal');
+}
+
+function saveEditReminder() {
+  const id = document.getElementById('editReminderId').value;
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  const text = document.getElementById('editReminderText').value.trim();
+  if (!text) { showToast('Please enter a reminder'); return; }
+  const date = document.getElementById('editReminderDate').value;
+  const time = document.getElementById('editReminderTime').value;
+  r.title = text;
+  r.category = document.getElementById('editReminderCat').value;
+  r.repeat = document.getElementById('editReminderRepeat').value;
+  if (date) {
+    r.datetime = new Date(date + 'T' + (time || '09:00') + ':00+05:30').toISOString();
+    scheduleReminder(r);
+  }
+  saveData(); closeModal('editReminderModal');
+  renderReminders(); renderSummaryIfVisible();
+  showToast('Reminder updated ✓');
 }
 
 function editByVoice(id) {
