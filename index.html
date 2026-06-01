@@ -1452,9 +1452,23 @@ function clearAllData() {
   showToast('Cleared'); renderReminders(); renderNotes();
 }
 
+// ══ CLEAN OLD BROKEN DATES ══
+function cleanBadDates() {
+  const cutoff = new Date('2026-01-01T00:00:00Z');
+  let changed = false;
+  reminders.forEach(r => {
+    if (r.datetime) {
+      const d = new Date(r.datetime);
+      if (d < cutoff) { r.datetime = null; changed = true; }
+    }
+  });
+  if (changed) saveData();
+}
+
 // ══ INIT ══
 function init() {
   loadData();
+  cleanBadDates();
   setupRecognition();
   updateClock();
   setInterval(updateClock, 30000);
