@@ -996,12 +996,15 @@ Reply with ONLY a raw JSON object, no markdown, no backticks:
 {"intent":"reminder","response":"Got it! Reminder saved.","reminder":{"title":"task title","category":"Important","datetime":"2026-06-01T14:00:00+05:30"}}
 
 Rules:
-- intent: reminder, note, or chat
-- For reminders always include reminder object
+- intent: reminder, edit, note, or chat
+- Use "edit" intent when user wants to change/update/reschedule an existing reminder
+- For "edit" intent, include reminder object with a "search" field (keyword to find the reminder) plus any fields to change
+- For "reminder" intent always include full reminder object
 - datetime must be ISO 8601 with +05:30 timezone offset for India
 - If user says "tomorrow" calculate from ${istDate}
 - category: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure
-- response: short friendly confirmation in 1 sentence`;
+- response: short friendly confirmation in 1 sentence
+- Example edit: {"intent":"edit","response":"Updated!","reminder":{"search":"kapil","datetime":"2026-06-02T14:00:00+05:30"}}`;
 
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key, {
       method: 'POST',
