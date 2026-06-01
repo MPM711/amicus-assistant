@@ -895,13 +895,17 @@ function setupRecognition() {
     el.textContent = display;
     el.classList.add('visible');
 
-    // Reset silence timer — stop after 4 seconds of silence
+    // Reset silence timer — stop after 3 seconds of silence
     clearTimeout(silenceTimer);
     if (finalTranscript.trim()) {
       silenceTimer = setTimeout(() => {
+        window._processingVoice = true;
+        const captured = finalTranscript.trim();
+        finalTranscript = '';
         stopListening();
-        processVoiceCommand(finalTranscript.trim());
-      }, 4000);
+        processVoiceCommand(captured);
+        setTimeout(() => { window._processingVoice = false; }, 3000);
+      }, 3000);
     }
   };
 
@@ -919,9 +923,17 @@ function setupRecognition() {
   };
 
   recognition.onend = () => {
-    if (isListening && !finalTranscript.trim()) {
-      // Restart if we stopped but user hasn't finished
-      try { recognition.start(); } catch(err){ stopListening(); }
+    // Only restart if still listening AND no final transcript captured yet
+    // This prevents echo loops
+    if (isListening && !finalTranscript.trim() && !window._processingVoice) {
+      setTimeout(() => {
+        if (isListening && !finalTranscript.trim()) {
+          try { recognition.start(); } catch(err){ stopListening(); }
+        }
+      }, 300);
+    } else if (isListening && finalTranscript.trim()) {
+      // We have text, stop cleanly
+      stopListening();
     }
   };
 }
@@ -930,9 +942,12 @@ function toggleMic() {
   if (isListening) {
     clearTimeout(silenceTimer);
     const text = document.getElementById('micTranscript').textContent.trim();
+    window._processingVoice = true;
     stopListening();
     if (text) processVoiceCommand(text);
+    setTimeout(() => { window._processingVoice = false; }, 3000);
   } else {
+    window._processingVoice = false;
     startListening();
   }
 }
