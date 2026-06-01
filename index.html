@@ -25,10 +25,10 @@
   --text: #2a2318;
   --text2: #6b5f4a;
   --text3: #a89880;
-  --gold: #9a7b35;
-  --gold-light: #c9a84c;
-  --gold-dim: rgba(154,123,53,0.1);
-  --gold-glow: rgba(201,168,76,0.08);
+  --gold: #b8860b;
+  --gold-light: #d4a017;
+  --gold-dim: rgba(184,134,11,0.12);
+  --gold-glow: rgba(212,160,23,0.08);
   --green: #3a7d52;
   --green-dim: rgba(58,125,82,0.1);
   --blue: #3a5f8a;
@@ -1009,6 +1009,19 @@ Rules:
 
     showAIResponse(parsed.response || 'Done.');
 
+
+    if (window._editingReminderId && parsed.reminder) {
+      const er = reminders.find(x => x.id === window._editingReminderId);
+      if (er) {
+        if (parsed.reminder.title) er.title = parsed.reminder.title;
+        if (parsed.reminder.category) er.category = parsed.reminder.category;
+        if (parsed.reminder.datetime) { er.datetime = parsed.reminder.datetime; scheduleReminder(er); }
+        saveData(); renderReminders();
+        showToast("Reminder updated");
+        window._editingReminderId = null;
+        return;
+      }
+    }
     if (parsed.intent === 'reminder' && parsed.reminder) {
       const r = {
         id: Date.now().toString(),
@@ -1160,8 +1173,21 @@ function reminderHTML(r) {
       <button class="ri-btn" onclick="markAction('${r.id}','inprogress')">🔄 In Progress</button>
       <button class="ri-btn" onclick="markAction('${r.id}','notstarted')">⭕ Not Started</button>
       <button class="ri-btn delegate" onclick="openDelegate('${r.id}')">👤 Delegate</button>
+      <button class="ri-btn" style="grid-column:span 3;border-color:rgba(184,134,11,0.35);color:var(--gold);" onclick="editByVoice('${r.id}')">🎙️ Edit by Voice</button>
     </div>
   </div>`;
+}
+
+function editByVoice(id) {
+  const r = reminders.find(x => x.id === id);
+  if (!r) return;
+  showToast('Speak your edit...');
+  showPage('voice', document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(() => {
+    startListening();
+    // After voice captured, update this reminder
+    window._editingReminderId = id;
+  }, 500);
 }
 
 function markAction(id, action) {
