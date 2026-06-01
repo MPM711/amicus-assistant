@@ -866,88 +866,49 @@ function setupRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return;
   recognition = new SR();
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = 'en-IN';
   recognition.maxAlternatives = 1;
 
-  let finalTranscript = '';
-
   recognition.onstart = () => {
-    finalTranscript = '';
     isListening = true;
     document.getElementById('micBtn').classList.add('listening');
-    document.getElementById('micStatus').textContent = 'Listening... speak freely, pause when done.';
+    document.getElementById('micStatus').textContent = 'Listening... speak now.';
     document.getElementById('micStatus').classList.add('active');
   };
 
   recognition.onresult = (e) => {
-    let interim = '';
+    let interim = '', final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        finalTranscript += e.results[i][0].transcript + ' ';
-      } else {
-        interim += e.results[i][0].transcript;
-      }
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
     }
-    const display = (finalTranscript + interim).trim();
     const el = document.getElementById('micTranscript');
-    el.textContent = display;
+    el.textContent = final || interim;
     el.classList.add('visible');
-
-    // Reset silence timer — stop after 3 seconds of silence
-    clearTimeout(silenceTimer);
-    if (finalTranscript.trim()) {
-      silenceTimer = setTimeout(() => {
-        window._processingVoice = true;
-        const captured = finalTranscript.trim();
-        finalTranscript = '';
-        stopListening();
-        processVoiceCommand(captured);
-        setTimeout(() => { window._processingVoice = false; }, 3000);
-      }, 3000);
+    if (final.trim()) {
+      stopListening();
+      processVoiceCommand(final.trim());
     }
   };
 
   recognition.onerror = (e) => {
-    if (e.error === 'no-speech') {
-      // Restart if no speech detected
-      if (isListening) {
-        try { recognition.stop(); } catch(err){}
-        setTimeout(() => { if (isListening) recognition.start(); }, 300);
-      }
-    } else {
-      stopListening();
-      showToast('Mic error: ' + e.error);
-    }
+    if (e.error !== 'no-speech') showToast('Mic error: ' + e.error);
+    stopListening();
   };
 
   recognition.onend = () => {
-    // Only restart if still listening AND no final transcript captured yet
-    // This prevents echo loops
-    if (isListening && !finalTranscript.trim() && !window._processingVoice) {
-      setTimeout(() => {
-        if (isListening && !finalTranscript.trim()) {
-          try { recognition.start(); } catch(err){ stopListening(); }
-        }
-      }, 300);
-    } else if (isListening && finalTranscript.trim()) {
-      // We have text, stop cleanly
-      stopListening();
-    }
+    if (isListening) stopListening();
   };
 }
 
 function toggleMic() {
   if (isListening) {
-    clearTimeout(silenceTimer);
     const text = document.getElementById('micTranscript').textContent.trim();
-    window._processingVoice = true;
     stopListening();
     if (text) processVoiceCommand(text);
-    setTimeout(() => { window._processingVoice = false; }, 3000);
   } else {
-    window._processingVoice = false;
     startListening();
   }
 }
