@@ -987,9 +987,25 @@ async function processVoiceCommand(text) {
     const istNow = now.toLocaleString('en-IN', {timeZone:'Asia/Kolkata'});
     const istDate = now.toLocaleDateString('en-CA', {timeZone:'Asia/Kolkata'});
 
+    // If editing a specific reminder, include its details in the prompt
+    let editContext = '';
+    if (window._editingReminderId) {
+      const er = reminders.find(x => x.id === window._editingReminderId);
+      if (er) {
+        editContext = `
+
+CURRENT REMINDER BEING EDITED:
+Title: "${er.title}"
+Category: ${er.category}
+Time: ${formatIST(er.datetime)}
+
+The user wants to modify THIS reminder. Extract what should change based on their instruction. Keep whatever they don't mention.`;
+      }
+    }
+
     const prompt = `You are Amicus, a personal assistant for an Indian user. The user said: "${text}"
 
-If the user is editing an existing reminder (phrases like "change this to", "edit this", "instead remind me to", "update this"), extract the NEW task title and NEW datetime from what they say. Always return a meaningful title based on the new task.
+If the user is editing an existing reminder (phrases like "change this to", "edit this", "instead remind me to", "update this"), extract the NEW task title and NEW datetime from what they say. Always return a meaningful title based on the new task.${editContext}
 
 Current IST date/time: ${istNow}
 Current ISO date (IST): ${istDate}
@@ -999,14 +1015,14 @@ Reply with ONLY a raw JSON object, no markdown, no backticks:
 
 Rules:
 - intent: reminder, edit, note, or chat
-- Use "edit" intent when user wants to change/update/reschedule an existing reminder
-- For "edit" intent, include reminder object with a "search" field (keyword to find the reminder) plus any fields to change
+- Use "edit" intent when user is modifying an existing reminder
+- For "edit" intent include reminder object with updated fields only
 - For "reminder" intent always include full reminder object
 - datetime must be ISO 8601 with +05:30 timezone offset for India
 - If user says "tomorrow" calculate from ${istDate}
 - category: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure
-- response: short friendly confirmation in 1 sentence
-- Example edit: {"intent":"edit","response":"Updated!","reminder":{"search":"kapil","datetime":"2026-06-02T14:00:00+05:30"}}`;
+- response: short friendly confirmation mentioning what changed
+- When editing, set intent to "edit" and return the full updated reminder object`;
 
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key, {
       method: 'POST',
