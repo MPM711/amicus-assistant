@@ -1100,7 +1100,7 @@ Rules:
 - datetime: calculate the correct future datetime based on current time above
 - response: short friendly confirmation`;
 
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + key, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -1494,7 +1494,7 @@ Task: ${taskDesc}
 Additional notes: ${notes || 'none'}
 The message should be from me, natural and direct. Just the message text, no subject line needed for WhatsApp.${via === 'email' ? ' Include a subject line at the start prefixed with "Subject: "' : ''}`;
 
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + key, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
@@ -1653,7 +1653,7 @@ async function testGemini() {
   saveSettings();
   showToast('Testing...');
   try {
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + key, {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + key, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({contents:[{parts:[{text:'Say "Amicus connected!" and nothing else.'}]}]})
