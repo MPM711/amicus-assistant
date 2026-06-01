@@ -989,6 +989,8 @@ async function processVoiceCommand(text) {
 
     const prompt = `You are Amicus, a personal assistant for an Indian user. The user said: "${text}"
 
+If the user is editing an existing reminder (phrases like "change this to", "edit this", "instead remind me to", "update this"), extract the NEW task title and NEW datetime from what they say. Always return a meaningful title based on the new task.
+
 Current IST date/time: ${istNow}
 Current ISO date (IST): ${istDate}
 
@@ -1256,13 +1258,11 @@ function saveEditReminder() {
 function editByVoice(id) {
   const r = reminders.find(x => x.id === id);
   if (!r) return;
-  showToast('Speak your edit...');
-  showPage('voice', document.querySelectorAll('.nav-btn')[0]);
-  setTimeout(() => {
-    startListening();
-    // After voice captured, update this reminder
-    window._editingReminderId = id;
-  }, 500);
+  window._editingReminderId = id;
+  window._editingReminderPage = document.querySelector('.page.active')?.id || 'page-reminders';
+  showToast('Speak your changes now...');
+  // Start listening without leaving current page
+  startListening();
 }
 
 function markAction(id, action) {
