@@ -1003,26 +1003,27 @@ The user wants to modify THIS reminder. Extract what should change based on thei
       }
     }
 
-    const prompt = `You are Amicus, a personal assistant for an Indian user. The user said: "${text}"
-
-If the user is editing an existing reminder (phrases like "change this to", "edit this", "instead remind me to", "update this"), extract the NEW task title and NEW datetime from what they say. Always return a meaningful title based on the new task.${editContext}
+    const prompt = `You are Amicus, a smart personal assistant for an Indian professional. The user said: "${text}"${editContext}
 
 Current IST date/time: ${istNow}
 Current ISO date (IST): ${istDate}
 
-Reply with ONLY a raw JSON object, no markdown, no backticks:
-{"intent":"reminder","response":"Got it! Reminder saved.","reminder":{"title":"task title","category":"Important","datetime":"2026-06-01T14:00:00+05:30"}}
+Understand the user's FULL intent — they may want to create a reminder, edit one, delegate a task to someone, or just chat. Be smart about context. If they say "send this to Viren at 11am tomorrow" while editing a reminder about Kapil, they mean: delegate this task to Viren with a WhatsApp message, and schedule it for tomorrow 11am.
+
+Reply with ONLY a raw JSON object, no markdown, no backticks. Choose the right structure:
+
+For reminder: {"intent":"reminder","response":"...","reminder":{"title":"...","category":"...","datetime":"ISO+05:30"}}
+For edit: {"intent":"edit","response":"...","reminder":{"title":"...","category":"...","datetime":"ISO+05:30"}}
+For delegation: {"intent":"delegate","response":"...","delegate":{"to":"person name","message":"full WhatsApp message text"},"reminder":{"datetime":"ISO+05:30 if time mentioned"}}
+For note: {"intent":"note","response":"..."}
+For chat: {"intent":"chat","response":"..."}
 
 Rules:
-- intent: reminder, edit, note, or chat
-- Use "edit" intent when user is modifying an existing reminder
-- For "edit" intent include reminder object with updated fields only
-- For "reminder" intent always include full reminder object
-- datetime must be ISO 8601 with +05:30 timezone offset for India
-- If user says "tomorrow" calculate from ${istDate}
+- datetime always ISO 8601 with +05:30 India offset
+- Calculate "tomorrow" from ${istDate}
+- For delegation: draft a natural, professional WhatsApp message from the user to the person, referencing the task context fully
 - category: Critical, Urgent, Important, Follow-up, Routine, Personal, Personal Finance, Personal Health, Work — Confidential, Leisure
-- response: short friendly confirmation mentioning what changed
-- When editing, set intent to "edit" and return the full updated reminder object`;
+- response: friendly 1-sentence confirmation of what you understood and did`;
 
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key, {
       method: 'POST',
@@ -1068,6 +1069,29 @@ Rules:
         return;
       }
     }
+    // Handle delegation from main voice page
+    if (parsed.intent === 'delegate' && parsed.delegate && !window._editingReminderId) {
+      const delegateTo = parsed.delegate.to || '';
+      const msg = parsed.delegate.message || 'Hi ' + delegateTo + ', please handle this task. Let me know when done.';
+      const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      window.open(waUrl, '_blank');
+      showToast('Opening WhatsApp...');
+      // Also create a follow-up reminder
+      if (parsed.reminder && parsed.reminder.datetime) {
+        const r = {
+          id: Date.now().toString(),
+          title: 'Confirm ' + delegateTo + ' completed: ' + (parsed.delegate.message || '').substring(0,40),
+          category: 'Follow-up',
+          datetime: parsed.reminder.datetime,
+          status: 'pending', repeat: 'none',
+          created: new Date().toISOString(),
+          followupSent: false, graceSent: false
+        };
+        reminders.unshift(r); saveData();
+        scheduleReminder(r);
+      }
+    }
+
     if (parsed.intent === 'reminder' && parsed.reminder) {
       const r = {
         id: Date.now().toString(),
