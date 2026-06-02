@@ -793,6 +793,24 @@ body.dark {
   </div>
 </div>
 
+
+<!-- ATTACHMENT MODAL -->
+<div class="modal-overlay" id="attachModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Attachments</div>
+    <input type="hidden" id="attachReminderId">
+    <div id="attachList" style="display:flex;flex-direction:column;gap:10px;max-height:200px;overflow-y:auto;"></div>
+    <div style="border:2px dashed var(--border2);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;" onclick="document.getElementById('attachFileInput').click()">
+      <div style="font-size:28px;margin-bottom:6px;">📎</div>
+      <div style="font-size:13px;color:var(--text2);">Tap to attach a photo or file</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Photos, PDFs, documents</div>
+    </div>
+    <input type="file" id="attachFileInput" style="display:none" accept="image/*,.pdf,.doc,.docx,.txt" onchange="handleAttachFile(event)">
+    <button class="btn btn-secondary" onclick="closeModal('attachModal')">Done</button>
+  </div>
+</div>
+
 <script>
 // ══ TIMEZONE: India Standard Time (UTC+5:30) ══
 const IST_OFFSET = 5.5 * 60 * 60 * 1000;
@@ -1252,6 +1270,8 @@ function reminderHTML(r) {
       <button class="ri-btn" onclick="markAction('${r.id}','notstarted')">⭕ Not Started</button>
       <button class="ri-btn delegate" onclick="openDelegate('${r.id}')">👤 Delegate</button>
       <button class="ri-btn" style="border-color:rgba(184,134,11,0.35);color:var(--gold);" onclick="editByVoice('${r.id}')">🎙️ Voice Edit</button>
+      ${r.attachments && r.attachments.length ? '<button class="ri-btn" style="border-color:rgba(58,95,138,0.3);color:var(--blue);" onclick="viewAttachments(\''+r.id+'\')">📎 ' + r.attachments.length + ' File' + (r.attachments.length > 1 ? 's' : '') + '</button>' : ''}
+      <button class="ri-btn" style="border-color:rgba(42,122,112,0.3);color:var(--teal);" onclick="addAttachment('${r.id}')">📎 Attach</button>
       <button class="ri-btn" style="border-color:rgba(58,95,138,0.35);color:var(--blue);" onclick="openEditReminder('${r.id}')">✏️ Edit</button>
       <button class="ri-btn" style="border-color:rgba(163,58,58,0.35);color:var(--red);" onclick="deleteReminder('${r.id}')">🗑️ Delete</button>
     </div>
@@ -1263,6 +1283,71 @@ function showResult(success, title, body) {
   document.getElementById('resultTitle').textContent = title;
   document.getElementById('resultBody').textContent = body || '';
   openModal('resultModal');
+}
+
+// ── ATTACHMENTS ──
+function addAttachment(reminderId) {
+  document.getElementById('attachReminderId').value = reminderId;
+  const r = reminders.find(x => x.id === reminderId);
+  renderAttachList(r);
+  openModal('attachModal');
+}
+
+function viewAttachments(reminderId) {
+  addAttachment(reminderId);
+}
+
+function renderAttachList(r) {
+  const list = document.getElementById('attachList');
+  if (!r || !r.attachments || !r.attachments.length) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:10px;">No attachments yet</div>';
+    return;
+  }
+  const rid = r.id;
+  let html = '';
+  r.attachments.forEach(function(a, i) {
+    const isImage = a.type && a.type.startsWith('image/');
+    const icon = isImage ? '<img src="' + a.data + '" style="width:48px;height:48px;object-fit:cover;border-radius:8px;">' : '<div style="font-size:28px;">' + (a.type === 'application/pdf' ? '📄' : '📎') + '</div>';
+    const size = a.size ? (a.size / 1024).toFixed(1) + ' KB' : '';
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg4);border-radius:var(--radius-sm);">';
+    html += icon;
+    html += '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;">' + a.name + '</div><div style="font-size:11px;color:var(--text3);">' + size + '</div></div>';
+    html += '<button onclick="deleteAttachment(this)" data-rid="' + rid + '" data-idx="' + i + '" style="background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;">×</button>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function handleAttachFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('File too large — max 5MB'); return; }
+  const reminderId = document.getElementById('attachReminderId').value;
+  const r = reminders.find(x => x.id === reminderId);
+  if (!r) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (!r.attachments) r.attachments = [];
+    r.attachments.push({name: file.name, type: file.type, size: file.size, data: e.target.result});
+    saveData();
+    renderAttachList(r);
+    renderReminders();
+    showToast('Attached: ' + file.name);
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function deleteAttachment(btn) {
+  const rid = btn.getAttribute('data-rid');
+  const idx = parseInt(btn.getAttribute('data-idx'));
+  const r = reminders.find(x => x.id === rid);
+  if (!r || !r.attachments) return;
+  r.attachments.splice(idx, 1);
+  saveData();
+  renderAttachList(r);
+  renderReminders();
+  showToast('Attachment removed');
 }
 
 function deleteReminder(id) {
@@ -1613,6 +1698,16 @@ function unlockAudio() {
 document.addEventListener('touchstart', unlockAudio, {once: true});
 document.addEventListener('click', unlockAudio, {once: true});
 
+// ── BACK BUTTON HANDLER ──
+window.addEventListener('popstate', function(e) {
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id !== 'page-voice') {
+    e.preventDefault();
+    showPage('voice', document.querySelectorAll('.nav-btn')[0]);
+    history.pushState(null, '', window.location.href);
+  }
+});
+
 function init() {
   loadData();
   cleanBadDates();
@@ -1635,6 +1730,9 @@ function init() {
   reminders.forEach(r => {
     if (r.datetime && (r.status === 'pending' || r.status === 'snoozed')) scheduleReminder(r);
   });
+
+  // Push state so back button works within app
+  history.pushState(null, '', window.location.href);
 
   // Service worker with cache busting
   if ('serviceWorker' in navigator) {
