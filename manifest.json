@@ -1,0 +1,43 @@
+{
+  "name": "Amicus — Your Trusted Friend",
+  "short_name": "Amicus",
+  "description": "Your personal AI assistant for reminders, tasks, delegation and life management",
+  "start_url": "/amicus-assistant/",
+  "scope": "/amicus-assistant/",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#f5f0e8",
+  "orientation": "portrait",
+  "lang": "en-IN",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Reminder",
+      "short_name": "Reminder",
+      "description": "Add a new reminder",
+      "url": "/amicus-assistant/#reminder",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Voice Note",
+      "short_name": "Note",
+      "description": "Save a quick voice note",
+      "url": "/amicus-assistant/#note",
+      "icons": [{"src": "icon-192.png", "sizes": "192x192"}]
+    }
+  ]
+}
